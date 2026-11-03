@@ -1,6 +1,6 @@
 process PREPARE_REFERENCE {
     tag "$meta.id"
-    label 'process_medium'
+    label 'process_low'
 
     container 'community.wave.seqera.io/library/seqkit:2.14.0--11e739c316bd874b'
 
