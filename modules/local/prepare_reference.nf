@@ -1,7 +1,7 @@
 process PREPARE_REFERENCE {
     tag "$meta.id"
 
-    container 'oras://community.wave.seqera.io/library/seqkit:2.14.0--242173bf1fbab6c9'
+    container 'community.wave.seqera.io/library/seqkit:2.14.0--11e739c316bd874b'
 
     input:
     tuple val(meta), path(fasta)

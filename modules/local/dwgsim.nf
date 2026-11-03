@@ -2,7 +2,7 @@ process DWGSIM {
     tag "$meta.id"
     label 'process_low'
 
-    container 'oras://community.wave.seqera.io/library/dwgsim:1.1.14--4aacc7c6b6be9584'
+    container 'community.wave.seqera.io/library/dwgsim:1.1.14--b4033839f1e4b148'
 
     input:
     tuple val(meta), path(fasta)

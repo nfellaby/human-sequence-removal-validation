@@ -2,7 +2,7 @@ process PBSIM {
     tag "$meta.id"
     label 'process_low'
 
-    container 'oras://community.wave.seqera.io/library/pbsim3:3.0.5--c4e31f8d7c24ef91'
+    container 'community.wave.seqera.io/library/pbsim3:3.0.5--86541aa3eccd4c3c'
 
     input:
     tuple val(meta), path(fasta)
