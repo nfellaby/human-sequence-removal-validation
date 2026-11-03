@@ -131,3 +131,15 @@ dwgsim \\
    $fasta \\
    $prefix
 ```
+
+- Running nextflow
+```bash
+nextflow run \
+    -latest \
+    -r feat/synthetise-reads \
+    -resume
+    nfellaby/human-sequence-removal-validation \
+    -profile singularity \
+    --input nf_samplesheet.tsv \
+    --outdir results
+```
