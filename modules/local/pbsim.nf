@@ -1,6 +1,6 @@
 process PBSIM {
     tag "$meta.id"
-    label 'process_moderate'
+    label 'process_medium'
 
     container 'community.wave.seqera.io/library/pbsim3:3.0.5--86541aa3eccd4c3c'
 
