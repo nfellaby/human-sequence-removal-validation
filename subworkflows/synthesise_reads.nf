@@ -11,9 +11,6 @@ workflow SYNTH_READS {
 
     main:
 
-        ch_versions = Channel.empty()
-
-
         //
         // Decompress, uppercase and drop short contigs
         //
