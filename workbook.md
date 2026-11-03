@@ -134,5 +134,13 @@ dwgsim \\
 
 - Running nextflow
 ```bash
-nextflow run -latest -r feat/synthetise-reads -resume nfellaby/human-sequence-removal-validation -profile slurm,apptainer --input nf_samplesheet.tsv --outdir results -resume
+nextflow run -w scratch/ -latest -r feat/synthetise-reads nfellaby/human-sequence-removal-validation -profile slurm,apptainer --input nf_samplesheet.tsv --outdir results -resume 
+```
+
+- Run stats:
+```bash
+Completed at: 03-Nov-2026 19:21:30
+Duration    : 2h 41m 9s
+CPU hours   : 265.9
+Succeeded   : 108
 ```
