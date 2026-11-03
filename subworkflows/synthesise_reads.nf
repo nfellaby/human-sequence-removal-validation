@@ -1,27 +1,18 @@
 #!/usr/bin/env nextflow
 
-include { CHECK_MD5         } from '../modules/local/check_md5'
 include { PREPARE_REFERENCE } from '../modules/local/prepare_reference'
 include { DWGSIM            } from '../modules/local/dwgsim'
 include { PBSIM             } from '../modules/local/pbsim'
 
 workflow SYNTH_READS {
     take:
-    ch_assemblies
+    ch_fasta        // [ meta, fasta ]
     platforms
 
     main:
 
         ch_versions = Channel.empty()
 
-        //
-        // Verify downloads where an MD5 is given
-        //
-        CHECK_MD5 ( ch_assemblies.with_md5 )
-        ch_versions = ch_versions.mix(CHECK_MD5.out.versions.first())
-
-        ch_fasta = CHECK_MD5.out.fasta
-            .mix( ch_assemblies.without_md5.map { meta, fasta, md5 -> [ meta, fasta ] } )
 
         //
         // Decompress, uppercase and drop short contigs
@@ -75,7 +66,6 @@ workflow SYNTH_READS {
             storeDir: params.outdir
         )
 
-        ch_versions
-            .collectFile(name: 'software_versions.yml', storeDir: "${params.outdir}/pipeline_info")
-
+    emit:
+    versions = ch_versions
 }

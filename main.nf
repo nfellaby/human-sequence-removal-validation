@@ -5,6 +5,7 @@
  */
 nextflow.enable.dsl = 2
 include { SYNTH_READS      } from './subworkflows/synthesise_reads'
+include { CHECK_MD5         } from '../modules/local/check_md5'
 
 
 workflow {
@@ -38,9 +39,22 @@ workflow {
             without_md5: true
         }
 
+    //
+    // Verify downloads where an MD5 is given
+    //
+    CHECK_MD5 ( ch_assemblies.with_md5 )
+    ch_versions = ch_versions.mix(CHECK_MD5.out.versions.first())
+
+    ch_fasta = CHECK_MD5.out.fasta
+        .mix( ch_assemblies.without_md5.map { meta, fasta, md5 -> [ meta, fasta ] } )
+
 
     // Synthesise Reads
-    SYNTH_READS(ch_assemblies, platforms)
+    SYNTH_READS(ch_fasta, platforms)
+
+    CHECK_MD5.out.versions.first()
+        .mix(SYNTH_READS.out.versions)
+        .collectFile(name: 'software_versions.yml', storeDir: "${params.outdir}/pipeline_info")
 
 
 }
