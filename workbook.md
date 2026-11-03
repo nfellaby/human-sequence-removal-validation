@@ -105,3 +105,29 @@ for m in *.md5; do \
 done \
 ```
 
+## Synthesising Reads
+Generate synthetic reads for each human assembly
+
+### Long single read, ONT
+```
+   pbsim \\
+      --strategy wgs \\
+      --method errhmm \\
+      --errhmm $model \\
+      --genome $fasta \\
+      --depth ${params.ont_depth} \\
+      --seed ${params.seed} \\
+      --id-prefix '${meta.id}|S' \\
+      --prefix sim \\
+      $args
+```
+
+### Short Paired read, illumina
+```
+dwgsim \\
+   $args \\
+   -N ${params.illumina_read_pairs} \\
+   -z ${params.seed} \\
+   $fasta \\
+   $prefix
+```
