@@ -1,7 +1,7 @@
 process CHECK_MD5 {
     tag "$meta.id"
 
-    conda 'conda-forge::coreutils=9.12'
+    container 'community.wave.seqera.io/library/pip_coreutils-python:1fdffefd6141582a'
 
     input:
     tuple val(meta), path(fasta), path(md5)
