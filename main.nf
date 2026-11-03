@@ -5,7 +5,7 @@
  */
 nextflow.enable.dsl = 2
 include { SYNTH_READS      } from './subworkflows/synthesise_reads'
-include { CHECK_MD5         } from '../modules/local/check_md5'
+include { CHECK_MD5         } from './modules/local/check_md5'
 
 
 workflow {
