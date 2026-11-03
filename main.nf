@@ -40,7 +40,7 @@ workflow {
 
 
     // Synthesise Reads
-    SYNTH_READS(ch_assemblies)
+    SYNTH_READS(ch_assemblies, platforms)
 
 
 }

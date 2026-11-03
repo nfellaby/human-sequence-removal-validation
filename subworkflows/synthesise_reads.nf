@@ -8,11 +8,12 @@ include { PBSIM             } from '../modules/local/pbsim'
 workflow SYNTH_READS {
     take:
     ch_assemblies
+    platforms
 
     main:
 
         ch_versions = Channel.empty()
-        
+
         //
         // Verify downloads where an MD5 is given
         //
