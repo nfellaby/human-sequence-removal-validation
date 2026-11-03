@@ -1,6 +1,6 @@
 process DWGSIM {
     tag "$meta.id"
-    label 'process_moderate'
+    label 'process_medium'
 
     container 'community.wave.seqera.io/library/dwgsim:1.1.14--b4033839f1e4b148'
 
