@@ -10,6 +10,9 @@ workflow SYNTH_READS {
     ch_assemblies
 
     main:
+
+        ch_versions = Channel.empty()
+        
         //
         // Verify downloads where an MD5 is given
         //

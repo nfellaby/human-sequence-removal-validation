@@ -19,8 +19,6 @@ workflow {
         error "Unknown platform(s) in --platforms: ${unknown.join(', ')}. Use illumina and/or ont."
     }
 
-    ch_versions = Channel.empty()
-
     //
     // Parse samplesheet
     //
