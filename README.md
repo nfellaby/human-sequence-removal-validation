@@ -98,10 +98,9 @@ done
 
 # Check files against its MD5:
 cd assemblies
-for m in *.md5; do \
-  f=${m%.md5} \
-  [[ "$(cut -d' ' -f1 "$m")" == "$(md5sum "$f" | cut -d' ' -f1)" ]] && \
-  echo "OK   $f" || echo "FAIL $f" \
-done \
+for m in *.md5; do
+  f=${m%.md5}
+  [[ "$(cut -d' ' -f1 "$m")" == "$(md5sum "$f" | cut -d' ' -f1)" ]] && echo "OK   $f" || echo "FAIL $f"
+done
 ```
 
