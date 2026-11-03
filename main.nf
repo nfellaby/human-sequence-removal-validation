@@ -4,12 +4,8 @@
  * listed in a samplesheet (sample,fasta[,md5]).
  */
 nextflow.enable.dsl = 2
-include { SYTH_READS      } from './subworkflows/synthesise_reads'
+include { SYNTH_READS      } from './subworkflows/synthesise_reads'
 
-include { CHECK_MD5         } from './modules/local/check_md5'
-include { PREPARE_REFERENCE } from './modules/local/prepare_reference'
-include { DWGSIM            } from './modules/local/dwgsim'
-include { PBSIM             } from './modules/local/pbsim'
 
 workflow {
 
