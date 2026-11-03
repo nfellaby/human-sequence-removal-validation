@@ -20,12 +20,18 @@ workflow {
         error "Unknown platform(s) in --platforms: ${unknown.join(', ')}. Use illumina and/or ont."
     }
 
+    def input_ext = params.input.tokenize('.').last().toLowerCase()
+    if (!(input_ext in ['csv', 'tsv'])) {
+        error "Samplesheet must be .csv or .tsv: ${params.input}"
+    }
+    def sep = input_ext == 'tsv' ? '\t' : ','
+
     //
     // Parse samplesheet
     //
     ch_assemblies = Channel
         .fromPath(params.input, checkIfExists: true)
-        .splitCsv(header: true, strip: true)
+        .splitCsv(header: true, strip: true, sep: sep)
         .map { row ->
             if (!row.sample || !row.fasta) {
                 error "Each samplesheet row needs 'sample' and 'fasta' values: ${row}"
