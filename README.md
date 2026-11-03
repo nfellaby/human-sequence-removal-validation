@@ -11,9 +11,15 @@ CSV with columns `sample,fasta,md5`. `fasta` can be a local path, `s3://` or `ht
 Convert the HPRC TSV (columns 6, 8 and 9 = Filename, AWS FASTA, FASTA MD5):
 
 ## Run
- 
 ```bash
-nextflow run . -profile conda --input samplesheet.csv --outdir results
+nextflow run \
+    -latest \
+    -r main \
+    -resume
+    nfellaby/human-sequence-removal-validation \
+    -profile singularity \
+    --input samplesheet.csv \
+    --outdir results
 ```
  
 | Parameter | Default | |
