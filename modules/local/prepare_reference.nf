@@ -1,7 +1,7 @@
 process PREPARE_REFERENCE {
     tag "$meta.id"
 
-    conda 'bioconda::seqkit=2.14.0'
+    container 'oras://community.wave.seqera.io/library/seqkit:2.14.0--242173bf1fbab6c9'
 
     input:
     tuple val(meta), path(fasta)
