@@ -60,7 +60,7 @@ workflow {
     // Synthesise Reads
     SYNTH_READS(ch_fasta, platforms)
 
-    CHECK_MD5.out.versions.first()
+    ch_versions
         .mix(SYNTH_READS.out.versions)
         .collectFile(name: 'software_versions.yml', storeDir: "${params.outdir}/pipeline_info")
 
