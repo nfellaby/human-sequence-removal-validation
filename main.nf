@@ -39,6 +39,8 @@ workflow {
             without_md5: true
         }
 
+    ch_versions = Channel.empty()
+
     //
     // Verify downloads where an MD5 is given
     //
