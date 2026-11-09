@@ -139,8 +139,127 @@ nextflow run -w scratch/ -latest -r feat/synthetise-reads nfellaby/human-sequenc
 
 - Run stats:
 ```bash
-Completed at: 03-Nov-2026 19:21:30
-Duration    : 2h 41m 9s
-CPU hours   : 265.9
-Succeeded   : 108
+Nextflow 26.10.5 is available - Please consider updating your version to it
+
+ N E X T F L O W   ~  version 26.10.4
+
+Launching `https://github.com/nfellaby/human-sequence-removal-validation` [distraught_tesla] revision: e93c5fc3da [main]
+
+executor >  slurm (112)
+[2f/511efd] process > CHECK_MD5 (HG02391)                     [100%] 28 of 28 ✔
+[7c/0cc7fe] process > SYNTH_READS:PREPARE_REFERENCE (HG03098) [100%] 28 of 28 ✔
+[95/0a0b4c] process > SYNTH_READS:DWGSIM (HG03098)            [100%] 28 of 28 ✔
+[8f/0fae19] process > SYNTH_READS:PBSIM (NA18959)             [100%] 28 of 28 ✔
+Waiting for file transfers to complete (2 files)
+Completed at: 06-Nov-2026 12:49:47
+Duration    : 2h 42m 15s
+CPU hours   : 285.7
+Succeeded   : 112
+```
+
+## Read Removal with Deacon
+### Default Settings
+- Running Read removal with Deacon using default parameters and the standard pangenome reference, used the [nf-deacon](https://github.com/nfellaby/nf-deacon) repo:
+```bash
+Nextflow 26.10.5 is available - Please consider updating your version to it
+
+ N E X T F L O W   ~  version 26.10.4
+
+Launching `https://github.com/nfellaby/nf-deacon` [golden_archimedes] revision: b7da0ef055 [main]
+
+executor >  slurm (57)
+[skipped  ] process > DEPLETE_READS:DEACON_INDEX_FETCH (panhuman-1)  [100%] 1 of 1, stored: 1 ✔
+[40/155ea9] process > DEPLETE_READS:DEACON_FILTER (HG06807_illumina) [100%] 56 of 56 ✔
+[bf/14994e] process > DEPLETE_READS:SUMMARISE_DEPLETION (1)          [100%] 1 of 1 ✔
+Completed at: 06-Nov-2026 13:44:22
+Duration    : 6m 31s
+CPU hours   : 10.5
+Succeeded   : 57
+```
+
+#### Results
+
+- ILLUMINA
+   - 99.997% reads removed across 28 samples
+   - 3,010 of 112,000,000 reads retained · lowest sample 99.994%
+- ONT
+   - 99.390% reads removed across 28 samples
+   - 1,048,516 of 171,802,652 reads retained · lowest sample 94.748%
+      - The sample with 95% read removal was associated with GRCh38.p14 (347,612 reads retained)
+
+### Refined Index
+- Running with an index created from the 28 assembled genomes:
+```bash
+cat reference_data/assemblies/*.fa.gz \
+   >>reference_data/combined_human_genome_assemblies.fa.gz
+deacon index build reference_data/combined_human_genome_assemblies.fa.gz \ 
+   >reference_data/indexes/combined_human_genome_assemblies.idx
+```
+- Re-run Deacon:
+```bash
+nextflow run -w work/ -r main nfellaby/nf-deacon -profile slurm,apptainer --input 20261104_synth-reads/simulated_samplesheet.csv --deacon_index reference_data/indexes/combined_human_genome_assemblies.idx --outdir 20261104_deacon-depletion_refined-index
+letion_refined-index -resume
+```
+
+#### Results
+- ILLUMINA
+   - 99.999% reads removed across 28 samples
+   - 1,048 of 112,000,000 reads retained · lowest sample 99.997%
+- ONT
+   - 99.385% reads removed across 28 samples
+   - 1,056,645 of 171,802,652 reads retained · lowest sample 94.744%
+      - The sample with 95% read removal was associated with GRCh38.p14 (347,612 reads retained)
+
+## Mapping Reads against References
+- Generate samplesheet
+```bash
+DEACON_DIR=20261104_deacon-depletion_refined-index/deacon
+REF_DIR=reference_data/assemblies        # where the HPRC .fa.gz files (and GRCh38) live
+
+{
+  echo "sample,platform,fastq_1,fastq_2,reference"
+  for json in "$DEACON_DIR"/*/*.deacon.json; do
+    base=$(basename "$json" .deacon.json)       # e.g. HG00146_illumina
+    platform=${base##*_}                        # illumina | ont
+    sample=${base%_*}                           # HG00146, GRCh38.p14
+    dir=$(dirname "$json")
+
+    if [[ $platform == illumina ]]; then
+      fq1=$(readlink -f "$dir/${base}.deacon_R1.fastq.gz")
+      fq2=$(readlink -f "$dir/${base}.deacon_R2.fastq.gz")
+    else
+      fq1=$(readlink -f "$dir/${base}.deacon.fastq.gz")
+      fq2=""
+    fi
+
+    refs=( "$REF_DIR/${sample}"*.f*.gz )
+    if [[ ${#refs[@]} -ne 1 || ! -e ${refs[0]} ]]; then
+      echo "WARN: expected one reference for $sample, found: ${refs[*]}" >&2
+      continue
+    fi
+
+    printf '%s,%s,%s,%s,%s\n' "$sample" "$platform" "$fq1" "$fq2" "$(readlink -f "${refs[0]}")"
+  done
+} > map_samplesheet.csv
+```
+
+- Run reference mapping:
+```bash
+nextflow run -latest -w work/ -r dev nfellaby/nf-read-ref-mapping -profile slurm,apptainer --input map_samplesheet.csv --outdir 20261104_deacon-depletion_refined-index_mapped -resume
+```
+
+- Run Time:
+```bash
+Pulling nfellaby/nf-read-ref-mapping:dev ...
+ Already-up-to-date
+Launching `https://github.com/nfellaby/nf-read-ref-mapping` [big_kalam] revision: 350d2d162c [dev]
+
+executor >  slurm (113)
+[2d/922d23] process > MAP_READS:MINIMAP2_INDEX (NA20346_hap2_hprc_r2_v1.0.1 (map-ont)) [100%] 56 of 56, cached: 56 ✔
+[0e/31cbfe] process > MAP_READS:MINIMAP2_ALIGN (NA18620_illumina)                      [100%] 56 of 56 ✔
+[d2/636d41] process > MAP_READS:BAM_STATS (HG02738_ont)                                [100%] 56 of 56 ✔
+[ba/b36134] process > MAP_READS:SUMMARISE_MAPPING (1)                                  [100%] 1 of 1 ✔                                                                                          Completed at: 06-Nov-2026 21:37:32                                                                                                                                                              Duration    : 13m 16s
+CPU hours   : 13.9 (68.5% cached)
+Succeeded   : 113
+Cached      : 56
 ```
